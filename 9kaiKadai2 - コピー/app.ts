@@ -60,9 +60,6 @@ class ThreeJSTest {
         //ジオメトリの作成
         var geom = new THREE.Geometry();
         //マテリアルの作成
-        // var opacity = this.controls.opacity;
-        // var transparent = this.controls.transparent;
-        // var particleNum = this.controls.particleNum;
         this.pointMaterial = new THREE.PointsMaterial({ size: 4, map: texture, blending: THREE.AdditiveBlending, color: 0xffffff, depthWrite: false, transparent: true, opacity: 0.5 })
         this.pvelocity = [];
         //particleの作成
