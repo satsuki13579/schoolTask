@@ -55,7 +55,7 @@ class ThreeJSTest {
             this.scene.remove(this.group);
             this.scene.remove(this.cubes);
             this.controls.isMerge = e;
-            this.createCube();
+            this.createCubeMerge();
             // this.createParticles();
         });
 
@@ -65,8 +65,57 @@ class ThreeJSTest {
         document.getElementById("viewport").appendChild(this.renderer.domElement);
 
     }
+    public createPoints(geom: THREE.Geometry) {
+        var material = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 3,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+        });
+        return new THREE.Points(geom, material);
+    }
 
     public createCube() {
+        // var geom = new THREE.Geometry();
+        this.geometry = new THREE.BoxGeometry(1, 1, 1);
+        this.material = new THREE.MeshLambertMaterial({ color: 0x55ff00 });
+        // var num = this.controls.num;
+        // for (var i = 0; i < num; i++) {
+        //     var mesh = new THREE.Mesh(this.geometry, this.material);
+        //     mesh.position.x = Math.random() * 100;
+        //     mesh.position.y = Math.random() * 100;
+        //     mesh.position.z = Math.random() * 100;
+        //     mesh.updateMatrix();
+        //     //メッシュをgeometryへMerge
+        //     geom.merge(<THREE.Geometry>mesh.geometry, mesh.matrix);
+        //     // this.scene.add(this.cubes);
+        // }
+        // this.cubes = new THREE.Mesh(geom, this.material);
+        // this.scene.add(this.cubes);
+        for (var i = 0; i < this.controls.num; i++) {
+            this.group = new THREE.Group();
+            var cubeGroup = this.createPoints(this.geometry);
+            this.group.add(cubeGroup);
+            this.group = new THREE.Mesh(this.geometry, this.material);
+            this.group.position.x = Math.random() * 100;
+            this.group.position.y = Math.random() * 100;
+            this.group.position.z = Math.random() * 100;
+            this.scene.add(this.group);
+        }
+
+        // for (var i = 0; i < this.controls.num; i++) {
+        //     this.cube = this.cubes.clone();
+        //     this.cubes.position.x = Math.random() * 100;
+        //     this.cubes.position.y = Math.random() * 100;
+        //     this.cubes.position.z = Math.random() * 100;
+        //     this.scene.add(this.cubes);
+        // }
+        // this.cubes = new THREE.Mesh(this.geometry, this.material);
+
+    }
+
+    public createCubeMerge() {
         var geom = new THREE.Geometry();
         this.geometry = new THREE.BoxGeometry(1, 1, 1);
         this.material = new THREE.MeshLambertMaterial({ color: 0x55ff00 });
@@ -83,7 +132,6 @@ class ThreeJSTest {
         }
         this.cubes = new THREE.Mesh(geom, this.material);
         this.scene.add(this.cubes);
-
     }
 
     private createScene() {
@@ -126,7 +174,7 @@ class GuiControl {
     constructor() {
         this.rotationSpeed = 0.01;
         this.isMerge = true;
-        this.num = 10;
+        this.num = 100;
     }
 }
 

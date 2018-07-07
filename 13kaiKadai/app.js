@@ -19,7 +19,14 @@ class ThreeJSTest {
         Physijs.scripts.ammo = './examples/js/ammo.js';
         this.controls = new GuiControl();
         //        var gui = new dat.GUI();
-        gui.add(this.controls, 'rotationSpeed', 0, 0.5);
+        gui.add(this.controls, 'frontWheel', -0.7, 0.7).onChange((e) => {
+            //ここで値の変更を行う
+            this.controls.frontWheel = e;
+            this.rrConstraint.setAngularLowerLimit(new THREE.Vector3(0, e, 0.1)); //下限値を設定
+            this.rrConstraint.setAngularUpperLimit(new THREE.Vector3(0, e, 0)); //上限値を設定
+            this.rlConstraint.setAngularLowerLimit(new THREE.Vector3(0, e, 0.1)); //下限値を設定
+            this.rlConstraint.setAngularUpperLimit(new THREE.Vector3(0, e, 0)); //上限値を設定
+        });
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(this.screenWidth, this.screenHeight);
         this.renderer.setClearColor(new THREE.Color(0x495ed));
@@ -64,13 +71,16 @@ class ThreeJSTest {
         this.scene.addConstraint(frConstraint);
         var flConstraint = new Physijs.DOFConstraint(fl, body, new THREE.Vector3(0, 4, 2));
         this.scene.addConstraint(flConstraint);
-        var rrConstraint = new Physijs.DOFConstraint(rr, body, new THREE.Vector3(10, 4, 8));
-        this.scene.addConstraint(rrConstraint);
-        var rlConstraint = new Physijs.DOFConstraint(rl, body, new THREE.Vector3(10, 4, 2));
-        this.scene.addConstraint(rlConstraint);
+        this.rrConstraint = new Physijs.DOFConstraint(rr, body, new THREE.Vector3(10, 4, 8));
+        this.scene.addConstraint(this.rrConstraint);
+        this.rlConstraint = new Physijs.DOFConstraint(rl, body, new THREE.Vector3(10, 4, 2));
+        this.scene.addConstraint(this.rlConstraint);
         // 制御側のタイヤの動きの制約
-        rrConstraint.setAngularLowerLimit(new THREE.Vector3(0, 0.5, 0.1)); //下限値を設定
-        rrConstraint.setAngularUpperLimit(new THREE.Vector3(0, 0.5, 0)); //上限値を設定
+        this.fw = this.controls.frontWheel;
+        this.rrConstraint.setAngularLowerLimit(new THREE.Vector3(0, this.fw, 0.1)); //下限値を設定
+        this.rrConstraint.setAngularUpperLimit(new THREE.Vector3(0, this.fw, 0)); //上限値を設定
+        this.rlConstraint.setAngularLowerLimit(new THREE.Vector3(0, this.fw, 0.1)); //下限値を設定
+        this.rlConstraint.setAngularUpperLimit(new THREE.Vector3(0, this.fw, 0)); //上限値を設定
         // モーターで駆動するタイヤの動きの制約
         frConstraint.setAngularLowerLimit(new THREE.Vector3(0, 0, 0));
         frConstraint.setAngularUpperLimit(new THREE.Vector3(0, 0, 0));
@@ -123,7 +133,7 @@ class ThreeJSTest {
 }
 class GuiControl {
     constructor() {
-        this.rotationSpeed = 0.01;
+        this.frontWheel = 0.8;
     }
 }
 window.onload = () => {

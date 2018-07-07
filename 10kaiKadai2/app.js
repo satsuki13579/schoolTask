@@ -1,3 +1,4 @@
+//isMergeのあたりが作れませんでした　時間が間に合わないのでできたところまでで提出します．
 ///<reference path="./node_modules/@types/stats.js/index.d.ts"/>
 ///<reference path="./node_modules/@types/three/index.d.ts"/>
 ///<reference path="./node_modules/@types/dat-gui/index.d.ts"/>
@@ -20,17 +21,6 @@ class ThreeJSTest {
         document.getElementById("viewport").appendChild(guielement);
         this.controls = new GuiControl();
         gui.add(this.controls, 'rotationSpeed', 0, 0.5);
-        // gui.add(this.controls, "opacity", 0, 1).onChange((e: number) => {
-        //     this.pointMaterial.opacity = e;
-        // });
-        // gui.add(this.controls, 'transparent').onChange((e: boolean) => {
-        //     this.pointMaterial.transparent = e;
-        // });
-        // gui.add(this.controls, 'particleNum', 0, 10000).onChange((e: number) => {
-        //     this.scene.remove(this.cloud);
-        //     this.controls.particleNum = e;
-        //     this.createParticles();
-        // });
         gui.add(this.controls, "num", 0, 10000).onChange((e) => {
             this.scene.remove(this.group);
             this.scene.remove(this.cubes);
@@ -42,7 +32,7 @@ class ThreeJSTest {
             this.scene.remove(this.group);
             this.scene.remove(this.cubes);
             this.controls.isMerge = e;
-            this.createCube();
+            this.createCubeMerge();
             // this.createParticles();
         });
         this.renderer = new THREE.WebGLRenderer();
@@ -50,26 +40,53 @@ class ThreeJSTest {
         this.renderer.setClearColor(new THREE.Color(0x495ed));
         document.getElementById("viewport").appendChild(this.renderer.domElement);
     }
-    // public createParticles() {
-    //     //ジオメトリの作成
-    //     var geom = new THREE.Geometry();
-    //     //マテリアルの作成
-    //     var opacity = this.controls.opacity;
-    //     var transparent = this.controls.transparent;
-    //     var particleNum = this.controls.particleNum;
-    //     this.pointMaterial = new THREE.PointsMaterial({ size: 4, vertexColors: THREE.VertexColors, opacity: opacity, transparent: transparent })
-    //     //particleの作成
-    //     for (var x = 0; x < particleNum; x++) {
-    //         var particle = new THREE.Vector3(Math.random() * 51, Math.random() * 51, Math.random() * 51);
-    //         geom.vertices.push(particle);
-    //         geom.colors.push(new THREE.Color(Math.random() * 0x00ffff));//色を設定
-    //     }
-    //     //THREE.Pointsの作成
-    //     this.cloud = new THREE.Points(geom, this.pointMaterial);
-    //     //シーンへの追加
-    //     // this.scene.add(this.cloud);
-    // }
+    createPoints(geom) {
+        var material = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 3,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+        });
+        return new THREE.Points(geom, material);
+    }
     createCube() {
+        // var geom = new THREE.Geometry();
+        this.geometry = new THREE.BoxGeometry(1, 1, 1);
+        this.material = new THREE.MeshLambertMaterial({ color: 0x55ff00 });
+        // var num = this.controls.num;
+        // for (var i = 0; i < num; i++) {
+        //     var mesh = new THREE.Mesh(this.geometry, this.material);
+        //     mesh.position.x = Math.random() * 100;
+        //     mesh.position.y = Math.random() * 100;
+        //     mesh.position.z = Math.random() * 100;
+        //     mesh.updateMatrix();
+        //     //メッシュをgeometryへMerge
+        //     geom.merge(<THREE.Geometry>mesh.geometry, mesh.matrix);
+        //     // this.scene.add(this.cubes);
+        // }
+        // this.cubes = new THREE.Mesh(geom, this.material);
+        // this.scene.add(this.cubes);
+        for (var i = 0; i < this.controls.num; i++) {
+            this.group = new THREE.Group();
+            var cubeGroup = this.createPoints(this.geometry);
+            this.group.add(cubeGroup);
+            this.group = new THREE.Mesh(this.geometry, this.material);
+            this.group.position.x = Math.random() * 100;
+            this.group.position.y = Math.random() * 100;
+            this.group.position.z = Math.random() * 100;
+            this.scene.add(this.group);
+        }
+        // for (var i = 0; i < this.controls.num; i++) {
+        //     this.cube = this.cubes.clone();
+        //     this.cubes.position.x = Math.random() * 100;
+        //     this.cubes.position.y = Math.random() * 100;
+        //     this.cubes.position.z = Math.random() * 100;
+        //     this.scene.add(this.cubes);
+        // }
+        // this.cubes = new THREE.Mesh(this.geometry, this.material);
+    }
+    createCubeMerge() {
         var geom = new THREE.Geometry();
         this.geometry = new THREE.BoxGeometry(1, 1, 1);
         this.material = new THREE.MeshLambertMaterial({ color: 0x55ff00 });
@@ -89,17 +106,6 @@ class ThreeJSTest {
     }
     createScene() {
         this.scene = new THREE.Scene();
-        // this.geometry = new THREE.BoxGeometry(1, 1, 1);
-        // this.material = new THREE.MeshLambertMaterial({ color: 0x55ff00 });
-        // var num = this.controls.num;
-        // for (var i = 0; i < num; i++) {
-        //     this.cubes = new THREE.Mesh(this.geometry, this.material);
-        //     this.cubes.position.x = Math.random() * 51;
-        //     this.cubes.position.y = Math.random() * 51;
-        //     this.cubes.position.z = Math.random() * 51;
-        // }
-        // this.cube = new THREE.Mesh(this.geometry, this.material);
-        // this.scene.add(this.cubes);
         this.stats.showPanel(0); // 0: fps, 1: ms
         this.stats.dom.style.position = 'absolute';
         this.stats.dom.style.left = '0px';
@@ -128,11 +134,8 @@ class ThreeJSTest {
 class GuiControl {
     constructor() {
         this.rotationSpeed = 0.01;
-        // this.opacity = 50;
-        // this.transparent = true;
-        // this.particleNum = 50;
         this.isMerge = true;
-        this.num = 10;
+        this.num = 100;
     }
 }
 window.onload = () => {
