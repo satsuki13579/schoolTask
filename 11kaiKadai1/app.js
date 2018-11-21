@@ -1,3 +1,4 @@
+//同時には動くとこまでは行きましたがそのあとができませんでした．
 ///<reference path="./node_modules/@types/three/index.d.ts"/>
 ///<reference path="./node_modules/@types/dat-gui/index.d.ts"/>
 ///<reference path="./node_modules/@types/tween.js/index.d.ts"/>
